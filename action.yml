@@ -8,14 +8,25 @@ inputs:
 runs:
   using: "composite"
   steps:
+
     - name: Get Rust Version from Cargo.toml
-      if: "${{ env.RUST_VERSION == '' }}" 
+      if: ${{ env.RUST_VERSION == '' }} && runner.os == 'macOS'
+      run: |
+        pip3 install yq 2>&1 1>/dev/null
+        echo "RUST_VERSION=$(tomlq -r ".package.rust" Cargo.toml)" >> $GITHUB_ENV
+        # Clean older versions of rustfmt and cargo-fmt to prevent warnings
+        rm -f /home/runner/.cargo/bin/rustfmt
+        rm -f /home/runner/.cargo/bin/cargo-fmt
+      shell: bash
+
+    - name: Get Rust Version from Cargo.toml
+      if: ${{ env.RUST_VERSION == '' }} && runner.os != 'macOS'
       run: |
         pip install yq 2>&1 1>/dev/null
         echo "RUST_VERSION=$(tomlq -r ".package.rust" Cargo.toml)" >> $GITHUB_ENV
         # Clean older versions of rustfmt and cargo-fmt to prevent warnings
-        rm /home/runner/.cargo/bin/rustfmt
-        rm /home/runner/.cargo/bin/cargo-fmt
+        rm -f /home/runner/.cargo/bin/rustfmt
+        rm -f /home/runner/.cargo/bin/cargo-fmt
       shell: bash
 
     - if: "${{ inputs.components == '' }}"
