@@ -1,0 +1,16 @@
+name: Test Rust Toolchain Version
+
+on:
+  push:
+  
+jobs:
+  installation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v3    
+      - name: Set Toolchain
+        uses: sbtaylor15/rust-toolchain@v1
+        with:
+          components: clippy
