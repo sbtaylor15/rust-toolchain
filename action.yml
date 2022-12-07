@@ -13,8 +13,9 @@ runs:
       if: "${{ env.RUST_VERSION == '' }}"
       run: |
         set -e
-        GOBIN=$PWD go install github.com/freshautomations/stoml@latest  
-        echo "RUST_VERSION=$(stoml Cargo.toml  "package.rust" 2>/dev/null || echo stable)" >> $GITHUB_ENV
+        # Install toml to json cli 
+        npm i -g toml-cli 
+        echo "RUST_VERSION=$(cat Cargo.toml 2>/dev/null | toml | jq -r 'try(.package.rust) // "stable"')" >> $GITHUB_ENV
         # Clean older versions of rustfmt and cargo-fmt to prevent warnings
         rm -f /home/runner/.cargo/bin/rustfmt
         rm -f /home/runner/.cargo/bin/cargo-fmt
